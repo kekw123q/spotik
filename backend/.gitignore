@@ -78,9 +78,9 @@ sketch
 
 coverage/
 
-../.idea/
-
 node/
 
 *node_modules/
+
+.idea
 
