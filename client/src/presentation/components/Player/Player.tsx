@@ -69,13 +69,12 @@ export const Player = () => {
     const isLoading = playerState === 'loading' || playerState === 'buffering';
     const isPlaying = playerState === 'playing';
 
-    // Determine repeat icon
     const RepeatIcon = repeatMode === 'one' ? Repeat1 : Repeat;
 
     return (
         <div className="fixed bottom-0 left-0 right-0 z-50 pointer-events-none">
             <div className="max-w-7xl mx-auto px-4 pb-6">
-                <div className="bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/80 border border-border rounded-xl shadow-2xl h-[90px] flex flex-col justify-center px-6 pointer-events-auto">
+                <div className="bg-card/95 text-card-foreground backdrop-blur supports-[backdrop-filter]:bg-card/80 border border-border rounded-xl shadow-2xl h-[90px] flex flex-col justify-center px-6 pointer-events-auto transition-all duration-300">
 
                     <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-4">
 
@@ -96,7 +95,7 @@ export const Player = () => {
                             <div className="min-w-0 flex flex-col justify-center overflow-hidden">
                                 <div
                                     className={cn(
-                                        "font-medium text-sm truncate pr-2",
+                                        "font-medium text-sm truncate pr-2 text-card-foreground",
                                         !hasTrack && "text-muted-foreground"
                                     )}
                                     title={hasTrack ? currentTrack.title : ""}
@@ -129,7 +128,7 @@ export const Player = () => {
                                     onClick={toggleShuffle}
                                     disabled={!hasTrack}
                                     className={cn(
-                                        "h-8 w-8 hover:text-foreground transition-colors relative",
+                                        "h-8 w-8 hover:text-card-foreground transition-colors relative",
                                         isShuffle ? "text-primary" : "text-muted-foreground",
                                         isShuffle && "after:content-[''] after:absolute after:-bottom-1 after:left-1/2 after:-translate-x-1/2 after:w-1 after:h-1 after:bg-primary after:rounded-full"
                                     )}
@@ -142,7 +141,7 @@ export const Player = () => {
                                     size="icon"
                                     onClick={playPrev}
                                     disabled={!hasTrack}
-                                    className="h-8 w-8 text-foreground"
+                                    className="h-8 w-8 text-card-foreground"
                                 >
                                     <SkipBack className="h-5 w-5 fill-current" />
                                 </Button>
@@ -168,7 +167,7 @@ export const Player = () => {
                                     size="icon"
                                     onClick={playNext}
                                     disabled={!hasTrack}
-                                    className="h-8 w-8 text-foreground"
+                                    className="h-8 w-8 text-card-foreground"
                                 >
                                     <SkipForward className="h-5 w-5 fill-current" />
                                 </Button>
@@ -180,7 +179,7 @@ export const Player = () => {
                                     onClick={toggleRepeat}
                                     disabled={!hasTrack}
                                     className={cn(
-                                        "h-8 w-8 hover:text-foreground transition-colors relative",
+                                        "h-8 w-8 hover:text-card-foreground transition-colors relative",
                                         repeatMode !== 'off' ? "text-primary" : "text-muted-foreground",
                                         repeatMode !== 'off' && "after:content-[''] after:absolute after:-bottom-1 after:left-1/2 after:-translate-x-1/2 after:w-1 after:h-1 after:bg-primary after:rounded-full"
                                     )}

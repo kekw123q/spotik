@@ -48,6 +48,33 @@ const mockTracks: Track[] = [
     coverUrl: 'https://images.unsplash.com/photo-1571330735066-03aaa9429d89?w=300&h=300&fit=crop',
     audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3',
   },
+    {
+        id: '6',
+        title: 'pim pim pum',
+        artist: 'papapa',
+        album: 'Digital Era',
+        duration: 279,
+        coverUrl: 'https://images.unsplash.com/photo-1571330735066-03aaa9429d89?w=300&h=300&fit=crop',
+        audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3',
+    },
+    {
+        id: '7',
+        title: 'pim pim pum',
+        artist: 'papapa',
+        album: 'Digital Era',
+        duration: 279,
+        coverUrl: 'https://images.unsplash.com/photo-1571330735066-03aaa9429d89?w=300&h=300&fit=crop',
+        audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-7.mp3',
+    },
+    {
+        id: '8',
+        title: 'pim pim pum',
+        artist: 'papapa',
+        album: 'Digital Era',
+        duration: 279,
+        coverUrl: 'https://images.unsplash.com/photo-1571330735066-03aaa9429d89?w=300&h=300&fit=crop',
+        audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3',
+    },
 ];
 
 const mockAuthorPlaylists: Playlist[] = [

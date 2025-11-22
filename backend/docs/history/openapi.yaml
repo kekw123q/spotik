@@ -1,0 +1,129 @@
+openapi: 3.0.0
+info:
+  title: History & Playback State Service
+  version: 1.0.0
+  description: Сервис для отслеживания истории прослушивания и синхронизации состояния плеера.
+servers:
+  - url: http://api.spotik.com/history
+tags:
+  - name: State
+  - name: Log
+paths:
+  /state/last:
+    get:
+      summary: Получить последнее состояние плеера (Cold Start)
+      description: Используется при загрузке приложения для восстановления сессии.
+      operationId: getLastState
+      tags:
+        - State
+      responses:
+        '200':
+          description: Последний активный трек и позиция
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlayerState'
+        '204':
+          description: История пуста
+
+  /state/report:
+    post:
+      summary: Обновить текущее состояние (Heartbeat)
+      description: Вызывается каждые N секунд, при паузе или смене трека.
+      operationId: reportState
+      tags:
+        - State
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReportStateRequest'
+      responses:
+        '200':
+          description: Состояние сохранено
+
+  /log:
+    get:
+      summary: Получить историю прослушиваний
+      operationId: getHistory
+      tags:
+        - Log
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+      responses:
+        '200':
+          description: Список последних треков
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/HistoryEntry'
+
+components:
+  schemas:
+    PlayerState:
+      type: object
+      properties:
+        trackId:
+          type: string
+          format: uuid
+        contextId:
+          type: string
+          format: uuid
+          nullable: true
+          description: ID плейлиста или альбома, откуда играл трек
+        contextType:
+          type: string
+          enum: [playlist, album, search, single]
+        timestamp:
+          type: integer
+          description: Позиция в секундах
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - trackId
+        - timestamp
+
+    ReportStateRequest:
+      type: object
+      properties:
+        trackId:
+          type: string
+        contextId:
+          type: string
+          nullable: true
+        contextType:
+          type: string
+        timestamp:
+          type: integer
+        status:
+          type: string
+          enum: [playing, paused, stopped]
+      required:
+        - trackId
+        - timestamp
+        - status
+
+    HistoryEntry:
+      type: object
+      properties:
+        trackId:
+          type: string
+        playedAt:
+          type: string
+          format: date-time
+        durationPlayed:
+          type: integer
+          description: Сколько секунд трека было прослушано фактически

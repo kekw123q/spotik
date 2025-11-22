@@ -9,14 +9,15 @@ import { PlaylistGrid } from '../presentation/components/Playlists/PlaylistGrid'
 import { UploadTrackDialog } from '@/presentation/components/Upload/UploadTrackDialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
-import { Loader2, Music, ArrowLeft, Sun, Moon } from 'lucide-react';
+import { Loader2, Music, ArrowLeft, Sun, Moon, Droplets } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { useTheme } from '@/components/theme-provider';
+import { cn } from '@/lib/utils';
 
 const Index = () => {
     const repository = useMusicRepository();
     const { play, currentTrack, playerState, pause, resume } = useAudioPlayerContext();
-    const { theme, setTheme } = useTheme();
+    const { theme, setTheme, isGlass, setGlass } = useTheme();
 
     // Data State
     const [searchTracks, setSearchTracks] = useState<Track[]>([]);
@@ -102,9 +103,13 @@ const Index = () => {
         setTheme(theme === "dark" ? "light" : "dark");
     };
 
+    const toggleGlass = () => {
+        setGlass(!isGlass);
+    };
+
     return (
         <div className="min-h-screen bg-background pb-32 transition-colors duration-300">
-            <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-10">
+            <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-10 transition-all duration-300">
                 <div className="max-w-7xl mx-auto px-4 py-4">
                     <div className="grid grid-cols-[240px_1fr_240px] items-center gap-4">
                         <div
@@ -122,9 +127,20 @@ const Index = () => {
                             </div>
                         </div>
 
-                        <div className="flex items-center justify-end">
+                        <div className="flex items-center justify-end gap-2">
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={toggleGlass}
+                                className={cn(
+                                    "transition-all duration-300",
+                                    isGlass ? "text-primary bg-primary/20 ring-1 ring-primary/50 shadow-[0_0_15px_rgba(99,102,241,0.3)]" : "text-muted-foreground"
+                                )}
+                            >
+                                <Droplets className="h-5 w-5" />
+                            </Button>
                             <Button variant="ghost" size="icon" onClick={toggleTheme}>
-                                {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+                                {theme === "light" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
                             </Button>
                         </div>
                     </div>
@@ -135,7 +151,7 @@ const Index = () => {
                 <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
                     <div className="flex flex-col md:flex-row gap-8">
                         <aside className="md:w-60 flex-shrink-0 space-y-6">
-                            <div className="bg-card rounded-lg border border-border p-2 shadow-sm">
+                            <div className="bg-card rounded-lg border border-border p-2 shadow-sm transition-all duration-300">
                                 <TabsList className="flex flex-col h-auto w-full gap-1 bg-transparent p-0">
                                     <TabsTrigger
                                         value="search"
@@ -152,7 +168,7 @@ const Index = () => {
                                 </TabsList>
                             </div>
 
-                            <div className="bg-card rounded-lg border border-border p-4 shadow-sm">
+                            <div className="bg-card rounded-lg border border-border p-4 shadow-sm transition-all duration-300">
                                 <h3 className="text-sm font-medium text-muted-foreground mb-4 px-2">Library</h3>
                                 <div className="space-y-2">
                                     <UploadTrackDialog />
@@ -160,7 +176,7 @@ const Index = () => {
                             </div>
                         </aside>
 
-                        <div className="flex-1 min-w-0 bg-card rounded-xl border border-border p-6 shadow-sm min-h-[600px]">
+                        <div className="flex-1 min-w-0 bg-card rounded-xl border border-border p-6 shadow-sm min-h-[600px] transition-all duration-300">
                             <TabsContent value="search" className="mt-0 space-y-6 animate-in fade-in-50 duration-300">
                                 <div className="mb-4">
                                     <h2 className="text-3xl font-bold mb-2 tracking-tight">Треки</h2>
