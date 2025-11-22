@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Track } from '@/domain/entities/Track.ts';
+import { useMusicRepository } from './useMusicRepository';
 
 export type PlayerState = 'idle' | 'loading' | 'buffering' | 'playing' | 'paused' | 'error';
 export type RepeatMode = 'off' | 'all' | 'one';
@@ -25,6 +26,7 @@ interface UseAudioPlayerReturn {
 }
 
 export const useAudioPlayer = (): UseAudioPlayerReturn => {
+    const repository = useMusicRepository();
     const audioRef = useRef<HTMLAudioElement | null>(null);
 
     // State
@@ -40,7 +42,6 @@ export const useAudioPlayer = (): UseAudioPlayerReturn => {
     const [queue, setQueue] = useState<Track[]>([]);
     const [originalQueue, setOriginalQueue] = useState<Track[]>([]);
 
-    // Refs for event listeners to access latest state without re-binding
     const stateRef = useRef({
         currentTrack,
         queue,
@@ -49,7 +50,6 @@ export const useAudioPlayer = (): UseAudioPlayerReturn => {
         isShuffle
     });
 
-    // Sync refs with state
     useEffect(() => {
         stateRef.current = { currentTrack, queue, originalQueue, repeatMode, isShuffle };
     }, [currentTrack, queue, originalQueue, repeatMode, isShuffle]);
@@ -63,22 +63,29 @@ export const useAudioPlayer = (): UseAudioPlayerReturn => {
 
         const handleLoadStart = () => setPlayerState('loading');
         const handleCanPlay = () => {
-            setPlayerState((prev) => prev === 'paused' ? 'paused' : 'playing');
-            if (audio.paused && audioRef.current?.src) {
-                audio.play().catch(e => console.error("Auto-play blocked:", e));
+            // Do not auto-set to playing if we are just restoring state
+            if (audioRef.current?.paused) {
+                setPlayerState('paused');
+            } else {
+                setPlayerState('playing');
             }
         };
         const handleWaiting = () => setPlayerState('buffering');
         const handlePlaying = () => setPlayerState('playing');
         const handlePause = () => setPlayerState('paused');
-        const handleTimeUpdate = () => setCurrentTime(audio.currentTime);
+        const handleTimeUpdate = () => {
+            setCurrentTime(audio.currentTime);
+            // Debounce save logic in real app, for now simple trigger
+            if (stateRef.current.currentTrack && Math.floor(audio.currentTime) % 5 === 0) {
+                repository.saveLastPlayed(stateRef.current.currentTrack.id, audio.currentTime);
+            }
+        };
         const handleDurationChange = () => setDuration(audio.duration || 0);
         const handleError = (e: ErrorEvent) => {
             console.error('Audio error event:', e);
             setPlayerState('error');
         };
 
-        // Logic for Auto-Advance
         const handleEnded = () => {
             const { repeatMode, currentTrack, queue } = stateRef.current;
 
@@ -88,21 +95,18 @@ export const useAudioPlayer = (): UseAudioPlayerReturn => {
                 return;
             }
 
-            // Logic for 'off' and 'all' (playlist repeat)
             if (currentTrack && queue.length > 0) {
                 const currentIndex = queue.findIndex(t => t.id === currentTrack.id);
                 const nextIndex = currentIndex + 1;
 
                 if (nextIndex < queue.length) {
-                    // Play next track
                     internalPlay(queue[nextIndex]);
                 } else if (repeatMode === 'all') {
-                    // Loop back to start
                     internalPlay(queue[0]);
                 } else {
-                    // Stop
                     setPlayerState('idle');
                     setCurrentTime(0);
+                    repository.saveLastPlayed('-1', 0); // Clear state
                 }
             } else {
                 setPlayerState('idle');
@@ -120,6 +124,26 @@ export const useAudioPlayer = (): UseAudioPlayerReturn => {
         audio.addEventListener('ended', handleEnded);
         audio.addEventListener('error', handleError as any);
 
+        // Resume Logic
+        const loadLastPlayed = async () => {
+            try {
+                const lastPlayed = await repository.getLastPlayed();
+                if (lastPlayed && lastPlayed.trackId !== '-1') {
+                    const track = await repository.getTrack(lastPlayed.trackId);
+                    if (track) {
+                        setCurrentTrack(track);
+                        audio.src = track.audioUrl;
+                        audio.currentTime = lastPlayed.position;
+                        setCurrentTime(lastPlayed.position);
+                        setPlayerState('paused'); // Start paused
+                    }
+                }
+            } catch (e) {
+                console.error("Failed to resume playback", e);
+            }
+        };
+        loadLastPlayed();
+
         return () => {
             audio.pause();
             audio.src = '';
@@ -136,37 +160,30 @@ export const useAudioPlayer = (): UseAudioPlayerReturn => {
         };
     }, []);
 
-    // Volume Sync
     useEffect(() => {
         if (audioRef.current) {
             audioRef.current.volume = volume;
         }
     }, [volume]);
 
-    // Helper to trigger playback without resetting queue logic from outside
     const internalPlay = (track: Track) => {
         if (!audioRef.current) return;
         setCurrentTrack(track);
         setPlayerState('loading');
         audioRef.current.src = track.audioUrl;
         audioRef.current.load();
+        audioRef.current.play().catch(console.error);
     };
-
-    // --- Public Methods ---
 
     const play = useCallback((track: Track, context?: Track[]) => {
         if (!audioRef.current) return;
 
-        // If playing the same track, just resume
         if (currentTrack?.id === track.id) {
             audioRef.current.play().catch(console.error);
             return;
         }
 
-        // Update queue if context provided
         if (context && context.length > 0) {
-            // If shuffle is already on, we need to shuffle the new context
-            // but keep the selected track first
             if (stateRef.current.isShuffle) {
                 const otherTracks = context.filter(t => t.id !== track.id);
                 const shuffled = fisherYatesShuffle(otherTracks);
@@ -182,7 +199,10 @@ export const useAudioPlayer = (): UseAudioPlayerReturn => {
 
     const pause = useCallback(() => {
         audioRef.current?.pause();
-    }, []);
+        if (currentTrack) {
+            repository.saveLastPlayed(currentTrack.id, audioRef.current?.currentTime || 0);
+        }
+    }, [currentTrack]);
 
     const resume = useCallback(() => {
         audioRef.current?.play().catch(console.error);
@@ -195,6 +215,7 @@ export const useAudioPlayer = (): UseAudioPlayerReturn => {
         setCurrentTrack(null);
         setPlayerState('idle');
         setCurrentTime(0);
+        repository.saveLastPlayed('-1', 0);
     }, []);
 
     const seek = useCallback((time: number) => {
@@ -225,17 +246,15 @@ export const useAudioPlayer = (): UseAudioPlayerReturn => {
     const toggleShuffle = useCallback(() => {
         setIsShuffle(prev => {
             const willShuffle = !prev;
-            const { currentTrack, originalQueue, queue } = stateRef.current;
+            const { currentTrack, originalQueue } = stateRef.current;
 
             if (willShuffle) {
-                // Turn ON: Shuffle current queue, keeping current track first
                 if (currentTrack && originalQueue.length > 0) {
                     const others = originalQueue.filter(t => t.id !== currentTrack.id);
                     const shuffled = fisherYatesShuffle(others);
                     setQueue([currentTrack, ...shuffled]);
                 }
             } else {
-                // Turn OFF: Restore original order
                 setQueue(originalQueue);
             }
             return willShuffle;
@@ -250,10 +269,9 @@ export const useAudioPlayer = (): UseAudioPlayerReturn => {
         let nextIndex = currentIndex + 1;
 
         if (nextIndex >= queue.length) {
-            if (repeatMode === 'all') nextIndex = 0; // Loop to start
-            else return; // End of playlist
+            if (repeatMode === 'all') nextIndex = 0;
+            else return;
         }
-
         internalPlay(queue[nextIndex]);
     }, []);
 
@@ -261,7 +279,6 @@ export const useAudioPlayer = (): UseAudioPlayerReturn => {
         const { queue, currentTrack, repeatMode } = stateRef.current;
         if (!currentTrack || queue.length === 0) return;
 
-        // If more than 3 seconds in, restart track
         if (audioRef.current && audioRef.current.currentTime > 3) {
             audioRef.current.currentTime = 0;
             return;
@@ -271,10 +288,9 @@ export const useAudioPlayer = (): UseAudioPlayerReturn => {
         let prevIndex = currentIndex - 1;
 
         if (prevIndex < 0) {
-            if (repeatMode === 'all') prevIndex = queue.length - 1; // Loop to end
-            else prevIndex = 0; // Stay at start
+            if (repeatMode === 'all') prevIndex = queue.length - 1;
+            else prevIndex = 0;
         }
-
         internalPlay(queue[prevIndex]);
     }, []);
 

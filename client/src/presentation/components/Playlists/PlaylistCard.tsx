@@ -1,42 +1,39 @@
 import { Playlist } from '../../../domain/entities/Playlist';
 import { Music } from 'lucide-react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 interface PlaylistCardProps {
-  playlist: Playlist;
-  onSelect: () => void;
+    playlist: Playlist;
+    onSelect: () => void;
 }
 
 export const PlaylistCard = ({ playlist, onSelect }: PlaylistCardProps) => {
-  return (
-    <Card
-      className="cursor-pointer hover:bg-accent transition-colors"
-      onClick={onSelect}
-    >
-      <CardHeader className="p-4 pb-3">
-        {playlist.coverUrl ? (
-          <img
-            src={playlist.coverUrl}
-            alt={playlist.name}
-            className="w-full aspect-square object-cover rounded-md mb-3"
-          />
-        ) : (
-          <div className="w-full aspect-square bg-muted rounded-md mb-3 flex items-center justify-center">
-            <Music className="h-12 w-12 text-muted-foreground" />
-          </div>
-        )}
-        <CardTitle className="text-base">{playlist.name}</CardTitle>
-        {playlist.description && (
-          <CardDescription className="text-sm line-clamp-2">
-            {playlist.description}
-          </CardDescription>
-        )}
-      </CardHeader>
-      <CardContent className="p-4 pt-0">
-        <div className="text-sm text-muted-foreground">
-          {playlist.tracks.length} {playlist.tracks.length === 1 ? 'track' : 'tracks'}
-        </div>
-      </CardContent>
-    </Card>
-  );
+    return (
+        <Card
+            className="cursor-pointer hover:bg-accent/80 transition-all group border-border bg-card overflow-hidden"
+            onClick={onSelect}
+        >
+            <CardHeader className="p-0">
+                <div className="aspect-square w-full relative overflow-hidden">
+                    {playlist.coverUrl ? (
+                        <img
+                            src={playlist.coverUrl}
+                            alt={playlist.name}
+                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        />
+                    ) : (
+                        <div className="w-full h-full bg-muted flex items-center justify-center group-hover:bg-muted/80 transition-colors">
+                            <Music className="h-16 w-16 text-muted-foreground/50" />
+                        </div>
+                    )}
+                </div>
+            </CardHeader>
+            <CardContent className="p-4">
+                <CardTitle className="text-base font-semibold line-clamp-1 mb-1">{playlist.name}</CardTitle>
+                <p className="text-sm text-muted-foreground line-clamp-1">
+                    {playlist.description || `${playlist.tracks.length} tracks`}
+                </p>
+            </CardContent>
+        </Card>
+    );
 };
