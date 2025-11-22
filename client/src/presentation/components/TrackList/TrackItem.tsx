@@ -21,7 +21,7 @@ export const TrackItem = ({ track, onSelect, isActive = false, isLiked = false, 
     return (
         <div
             className={cn(
-                'group flex items-center gap-3 p-2 rounded-lg hover:bg-accent/50 transition-colors cursor-pointer',
+                'group flex items-center gap-4 px-6 py-3 hover:bg-accent/50 transition-colors cursor-pointer w-full', // Increased padding
                 isActive && 'bg-accent'
             )}
             onClick={onSelect}
@@ -31,26 +31,26 @@ export const TrackItem = ({ track, onSelect, isActive = false, isLiked = false, 
                     <img
                         src={track.coverUrl}
                         alt={track.title}
-                        className="w-10 h-10 rounded object-cover"
+                        className="w-12 h-12 rounded-md object-cover" // Increased size
                     />
                 ) : (
-                    <div className="w-10 h-10 rounded bg-muted flex items-center justify-center">
-                        <Play className="h-4 w-4 text-muted-foreground" />
+                    <div className="w-12 h-12 rounded-md bg-muted flex items-center justify-center">
+                        <Play className="h-5 w-5 text-muted-foreground" />
                     </div>
                 )}
                 <div className={cn(
-                    "absolute inset-0 m-auto flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity rounded",
+                    "absolute inset-0 m-auto flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity rounded-md",
                     isActive && "opacity-100 bg-black/0"
                 )}>
-                    <Play className={cn("h-4 w-4 text-white", isActive && "fill-primary text-primary")} />
+                    <Play className={cn("h-5 w-5 text-white", isActive && "fill-primary text-primary")} />
                 </div>
             </div>
 
-            <div className="flex-1 min-w-0">
-                <div className={cn('font-medium truncate text-sm', isActive && 'text-primary')}>
+            <div className="flex-1 min-w-0 flex flex-col justify-center">
+                <div className={cn('font-medium truncate text-base', isActive && 'text-primary')}>
                     {track.title}
                 </div>
-                <div className="text-xs text-muted-foreground truncate">
+                <div className="text-sm text-muted-foreground truncate">
                     {track.artist}
                 </div>
             </div>
@@ -60,8 +60,7 @@ export const TrackItem = ({ track, onSelect, isActive = false, isLiked = false, 
                     size="icon"
                     variant="ghost"
                     className={cn(
-                        "h-8 w-8 transition-opacity focus:opacity-100",
-                        // Ensure button is visible if liked OR if hovering over the row
+                        "h-9 w-9 transition-opacity focus:opacity-100",
                         isLiked ? "opacity-100 text-primary" : "opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-primary"
                     )}
                     onClick={(e) => {
@@ -69,11 +68,11 @@ export const TrackItem = ({ track, onSelect, isActive = false, isLiked = false, 
                         onToggleLike(track);
                     }}
                 >
-                    <Heart className={cn("h-4 w-4", isLiked && "fill-current")} />
+                    <Heart className={cn("h-5 w-5", isLiked && "fill-current")} />
                 </Button>
             )}
 
-            <div className="text-xs text-muted-foreground w-10 text-right tabular-nums">
+            <div className="text-sm text-muted-foreground w-12 text-right tabular-nums">
                 {formatDuration(track.duration)}
             </div>
         </div>

@@ -25,7 +25,6 @@ const Index = () => {
     const [activeTab, setActiveTab] = useState("search");
     const [selectedPlaylist, setSelectedPlaylist] = useState<Playlist | null>(null);
 
-    // NEW: Store IDs of liked tracks to sync UI
     const [likedTrackIds, setLikedTrackIds] = useState<Set<string>>(new Set());
 
     const [isLoadingTracks, setIsLoadingTracks] = useState(false);
@@ -41,12 +40,10 @@ const Index = () => {
         }
     }, [activeTab]);
 
-    // --- Event Listener for Player <-> List synchronization ---
     useEffect(() => {
         const handleLikeToggleEvent = (e: CustomEvent) => {
             const { trackId, isLiked } = e.detail;
 
-            // 1. Update global set of liked IDs
             setLikedTrackIds(prev => {
                 const next = new Set(prev);
                 if (isLiked) next.add(trackId);
@@ -54,7 +51,6 @@ const Index = () => {
                 return next;
             });
 
-            // 2. If we are viewing "Liked Songs", remove the track if isLiked becomes false
             if (selectedPlaylist?.id === 'liked-songs' && !isLiked) {
                 setSelectedPlaylist(prev => {
                     if (!prev) return null;
@@ -80,7 +76,7 @@ const Index = () => {
             const [tracksData, userData, likedTracks] = await Promise.all([
                 repository.searchTracks(''),
                 repository.getUserPlaylists(),
-                repository.getLikedTracks() // Fetch likes to sync UI on load
+                repository.getLikedTracks()
             ]);
             setSearchTracks(tracksData);
             setUserPlaylists(userData);
@@ -138,12 +134,9 @@ const Index = () => {
         setTheme(theme === "dark" ? "light" : "dark");
     };
 
-    // --- Handle Like Toggle from List Row ---
     const handleLikeToggle = async (track: Track) => {
         try {
             const newState = await repository.toggleLike(track.id);
-
-            // Dispatch event to notify Player and Index (ourselves)
             window.dispatchEvent(new CustomEvent('music:like-toggled', {
                 detail: { trackId: track.id, isLiked: newState }
             }));
@@ -234,66 +227,71 @@ const Index = () => {
                             </div>
                         </aside>
 
-                        <div className="flex-1 min-w-0 bg-card rounded-xl border border-border p-6 shadow-sm min-h-[600px]">
-                            <TabsContent value="search" className="mt-0 space-y-6">
-                                <div className="mb-4">
+                        {/* Changed: Removed p-6 to let content go full width, added overflow-hidden */}
+                        <div className="flex-1 min-w-0 bg-card rounded-xl border border-border shadow-sm min-h-[600px] overflow-hidden flex flex-col">
+                            <TabsContent value="search" className="mt-0 flex-1 flex flex-col">
+                                <div className="p-6 pb-4">
                                     <h2 className="text-3xl font-bold mb-2 tracking-tight">Треки</h2>
                                     <p className="text-muted-foreground">Найдите свою любимую музыку</p>
                                 </div>
-                                <TrackList
-                                    tracks={searchTracks}
-                                    onTrackSelect={(track) => handleTrackSelect(track, searchTracks)}
-                                    currentTrackId={currentTrack?.id}
-                                    isLoading={isLoadingTracks}
-                                    onToggleLike={handleLikeToggle}
-                                    likedTrackIds={likedTrackIds} // Pass the set of liked IDs
-                                />
+                                <div className="flex-1">
+                                    <TrackList
+                                        tracks={searchTracks}
+                                        onTrackSelect={(track) => handleTrackSelect(track, searchTracks)}
+                                        currentTrackId={currentTrack?.id}
+                                        isLoading={isLoadingTracks}
+                                        onToggleLike={handleLikeToggle}
+                                        likedTrackIds={likedTrackIds}
+                                    />
+                                </div>
                             </TabsContent>
 
-                            <TabsContent value="user" className="mt-0">
+                            <TabsContent value="user" className="mt-0 flex-1 flex flex-col">
                                 {selectedPlaylist ? (
-                                    <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
-                                        <Button variant="ghost" className="gap-2 pl-0 hover:pl-2 transition-all" onClick={handleBackToPlaylists}>
-                                            <ArrowLeft className="h-4 w-4" />
-                                            Назад к коллекции
-                                        </Button>
+                                    <div className="animate-in fade-in slide-in-from-right-4 duration-300 flex-1 flex flex-col">
+                                        <div className="p-6 pb-0">
+                                            <Button variant="ghost" className="gap-2 pl-0 hover:pl-2 transition-all mb-4" onClick={handleBackToPlaylists}>
+                                                <ArrowLeft className="h-4 w-4" />
+                                                Назад к коллекции
+                                            </Button>
 
-                                        <div className="flex flex-col md:flex-row gap-6 items-start">
-                                            {selectedPlaylist.id === 'liked-songs' ? (
-                                                <div className="w-48 h-48 rounded-lg shadow-lg flex items-center justify-center bg-gradient-to-br from-purple-600 to-red-600">
-                                                    <Heart className="h-20 w-20 text-white fill-white" />
-                                                </div>
-                                            ) : selectedPlaylist.coverUrl ? (
-                                                <img src={selectedPlaylist.coverUrl} alt={selectedPlaylist.name} className="w-48 h-48 rounded-lg shadow-lg object-cover" />
-                                            ) : (
-                                                <div className="w-48 h-48 bg-muted rounded-lg flex items-center justify-center">
-                                                    <Music className="h-16 w-16 text-muted-foreground" />
-                                                </div>
-                                            )}
-                                            <div>
-                                                <div className="flex items-center gap-2 text-muted-foreground text-sm mb-1 uppercase tracking-wider font-medium">
-                                                    Плейлист
-                                                </div>
-                                                <h2 className="text-4xl font-bold mb-3">{selectedPlaylist.name}</h2>
-                                                <p className="text-muted-foreground mb-4 text-lg">{selectedPlaylist.description}</p>
-                                                <div className="flex items-center gap-2 text-sm font-medium">
-                                                    <span>{selectedPlaylist.tracks.length} треков</span>
+                                            <div className="flex flex-col md:flex-row gap-6 items-start mb-6">
+                                                {selectedPlaylist.id === 'liked-songs' ? (
+                                                    <div className="w-48 h-48 rounded-lg shadow-lg flex items-center justify-center bg-gradient-to-br from-purple-600 to-red-600">
+                                                        <Heart className="h-20 w-20 text-white fill-white" />
+                                                    </div>
+                                                ) : selectedPlaylist.coverUrl ? (
+                                                    <img src={selectedPlaylist.coverUrl} alt={selectedPlaylist.name} className="w-48 h-48 rounded-lg shadow-lg object-cover" />
+                                                ) : (
+                                                    <div className="w-48 h-48 bg-muted rounded-lg flex items-center justify-center">
+                                                        <Music className="h-16 w-16 text-muted-foreground" />
+                                                    </div>
+                                                )}
+                                                <div>
+                                                    <div className="flex items-center gap-2 text-muted-foreground text-sm mb-1 uppercase tracking-wider font-medium">
+                                                        Плейлист
+                                                    </div>
+                                                    <h2 className="text-4xl font-bold mb-3">{selectedPlaylist.name}</h2>
+                                                    <p className="text-muted-foreground mb-4 text-lg">{selectedPlaylist.description}</p>
+                                                    <div className="flex items-center gap-2 text-sm font-medium">
+                                                        <span>{selectedPlaylist.tracks.length} треков</span>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
 
-                                        <div className="pt-4">
+                                        <div className="flex-1">
                                             <TrackList
                                                 tracks={selectedPlaylist.tracks}
                                                 onTrackSelect={(track) => handleTrackSelect(track, selectedPlaylist.tracks)}
                                                 currentTrackId={currentTrack?.id}
                                                 onToggleLike={handleLikeToggle}
-                                                likedTrackIds={likedTrackIds} // Pass here too
+                                                likedTrackIds={likedTrackIds}
                                             />
                                         </div>
                                     </div>
                                 ) : (
-                                    <div className="space-y-8 animate-in fade-in duration-300">
+                                    <div className="p-6 space-y-8 animate-in fade-in duration-300">
                                         <div>
                                             <h2 className="text-3xl font-bold mb-6">Коллекция</h2>
                                             {likedPlaylist && (
