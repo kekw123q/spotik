@@ -1,0 +1,108 @@
+openapi: 3.0.0
+info:
+  title: Music Catalog Service
+  version: 1.0.0
+  description: Сервис для управления метаданными треков и поиска.
+servers:
+  - url: http://api.spotik.com/catalog
+tags:
+  - name: Tracks
+paths:
+  /tracks/search:
+    get:
+      summary: Поиск треков
+      operationId: searchTracks
+      tags:
+        - Tracks
+      parameters:
+        - name: q
+          in: query
+          description: Поисковой запрос (название, артист, альбом)
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Список найденных треков
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Track'
+
+  /tracks:
+    post:
+      summary: Создание метаданных трека (после загрузки файла)
+      operationId: createTrackMetadata
+      tags:
+        - Tracks
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTrackRequest'
+      responses:
+        '201':
+          description: Трек успешно создан
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Track'
+
+components:
+  schemas:
+    Track:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        artist:
+          type: string
+        album:
+          type: string
+          nullable: true
+        duration:
+          type: integer
+          description: Длительность в секундах
+        coverUrl:
+          type: string
+          format: uri
+          description: URL обложки (ссылка на Media Service)
+        audioUrl:
+          type: string
+          format: uri
+          description: URL аудио-потока (ссылка на Media Service)
+      required:
+        - id
+        - title
+        - artist
+        - duration
+        - audioUrl
+
+    CreateTrackRequest:
+      type: object
+      properties:
+        title:
+          type: string
+        artist:
+          type: string
+        album:
+          type: string
+        duration:
+          type: integer
+        mediaId:
+          type: string
+          description: ID загруженного аудиофайла из Media Service
+        coverMediaId:
+          type: string
+          description: ID загруженной обложки из Media Service
+      required:
+        - title
+        - artist
+        - duration
+        - mediaId

@@ -1,0 +1,103 @@
+openapi: 3.0.0
+info:
+  title: Library & Playlist Service
+  version: 1.0.0
+  description: Управление пользовательскими коллекциями и плейлистами.
+servers:
+  - url: http://api.spotik.com/library
+tags:
+  - name: Playlists
+paths:
+  /playlists/user:
+    get:
+      summary: Получить плейлисты текущего пользователя
+      operationId: getUserPlaylists
+      tags:
+        - Playlists
+      responses:
+        '200':
+          description: Список плейлистов пользователя
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Playlist'
+
+  /playlists/author:
+    get:
+      summary: Получить кураторские/авторские плейлисты
+      operationId: getAuthorPlaylists
+      tags:
+        - Playlists
+      responses:
+        '200':
+          description: Список авторских плейлистов
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Playlist'
+
+  /playlists/{id}:
+    get:
+      summary: Получить детали плейлиста
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Детали плейлиста с треками
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Playlist'
+
+components:
+  schemas:
+    # Library Service хранит структуру плейлиста, но данные Треков
+    # он может либо хранить как кэш, либо агрегировать через Catalog Service (BFF паттерн)
+    # Для фронтенда структура остается такой:
+    Playlist:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        coverUrl:
+          type: string
+        isUserPlaylist:
+          type: boolean
+        tracks:
+          type: array
+          items:
+            $ref: '#/components/schemas/TrackSummary'
+      required:
+        - id
+        - name
+        - tracks
+        - isUserPlaylist
+
+    TrackSummary:
+      type: object
+      description: Упрощенная модель трека для списка
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        artist:
+          type: string
+        duration:
+          type: integer
+        coverUrl:
+          type: string
+        audioUrl:
+          type: string

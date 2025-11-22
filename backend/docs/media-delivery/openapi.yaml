@@ -1,0 +1,84 @@
+openapi: 3.0.0
+info:
+  title: Media Delivery Service
+  version: 1.0.0
+  description: Сервис загрузки и стриминга контента (Аудио, Видео, Изображения).
+servers:
+  - url: http://api.spotik.com/media
+tags:
+  - name: Streaming
+  - name: Upload
+paths:
+  /stream/{resourceId}:
+    get:
+      summary: Получить ссылку на поток или сам поток
+      description: Используется плеером для воспроизведения. В будущем может возвращать манифест для видео.
+      operationId: getStreamUrl
+      tags:
+        - Streaming
+      parameters:
+        - name: resourceId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID медиа-ресурса (не ID трека из БД, а ID файла)
+      responses:
+        '200':
+          description: JSON с прямой ссылкой на CDN или Presigned URL
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  url:
+                    type: string
+                    format: uri
+                    example: "https://cdn.spotik.com/audio/12345.mp3?token=..."
+        '302':
+          description: Редирект непосредственно на файл (альтернативный вариант)
+
+  /upload:
+    post:
+      summary: Загрузка медиа-файла
+      description: Загрузка аудио или обложки. Возвращает ID ресурса для привязки в Catalog Service.
+      operationId: uploadFile
+      tags:
+        - Upload
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                type:
+                  type: string
+                  enum: [audio, image, video]
+      responses:
+        '201':
+          description: Файл загружен
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  mediaId:
+                    type: string
+                    description: Внутренний ID файла
+                  publicUrl:
+                    type: string
+                    description: Публичная ссылка (если применимо)
+
+components:
+  schemas:
+    Error:
+      type: object
+      properties:
+        code:
+          type: integer
+        message:
+          type: string
