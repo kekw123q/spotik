@@ -1,0 +1,41 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+data:
+  config.yaml: |
+    env: "prod"
+    
+    catalog:
+      http:
+        port: "8080"
+      db:
+        dsn: "" # Будет перекрыто ENV
+
+    library:
+      http:
+        port: "8080"
+      db:
+        dsn: ""
+
+    media:
+      http:
+        port: "8080"
+      db:
+        dsn: ""
+
+    history:
+      http:
+        port: "8080"
+      db:
+        dsn: ""
+
+    minio:
+      endpoint: "minio:9000"
+      use_ssl: false
+      buckets:
+        audio: "audio-files"
+        images: "image-files"
+        public: "public-assets"
+      access_key: ""
+      secret_key: ""

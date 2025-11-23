@@ -84,3 +84,5 @@ node/
 
 .idea
 
+
+deploy/k8s/apps/secrets.yaml

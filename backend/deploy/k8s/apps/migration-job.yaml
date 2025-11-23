@@ -1,0 +1,26 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: auto-migrator
+  annotations:
+    skaffold.dev/run-id: "static"
+spec:
+  ttlSecondsAfterFinished: 120
+  template:
+    spec:
+      containers:
+        - name: migrator
+          image: spotik/migrator:latest
+          command: ["/bin/sh", "-c"]
+          # Последовательный запуск миграций для всех сервисов
+          args:
+            - |
+              echo "--- Migrating Catalog ---" && \
+              ./migrator -path migrations/catalog -dsn "postgres://user:pass@catalog-db:5432/catalog_db?sslmode=disable" up && \
+              echo "--- Migrating Library ---" && \
+              ./migrator -path migrations/library -dsn "postgres://user:pass@library-db:5432/library_db?sslmode=disable" up && \
+              echo "--- Migrating Media ---" && \
+              ./migrator -path migrations/media -dsn "postgres://user:pass@media-db:5432/media_db?sslmode=disable" up && \
+              echo "--- Migrating History ---" && \
+              ./migrator -path migrations/history -dsn "postgres://user:pass@history-db:5432/history_db?sslmode=disable" up
+      restartPolicy: Never

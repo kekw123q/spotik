@@ -30,10 +30,22 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Track'
+        '400':
+          description: Некорректный запрос
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 
   /tracks:
     post:
-      summary: Создание метаданных трека (после загрузки файла)
+      summary: Создание метаданных трека
       operationId: createTrackMetadata
       tags:
         - Tracks
@@ -50,6 +62,51 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Track'
+        '400':
+          description: Ошибка валидации
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /tracks/{id}:
+    get:
+      summary: Получить трек по ID
+      operationId: getTrack
+      tags:
+        - Tracks
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Детали трека
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Track'
+        '404':
+          description: Трек не найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 
 components:
   schemas:
@@ -72,11 +129,11 @@ components:
         coverUrl:
           type: string
           format: uri
-          description: URL обложки (ссылка на Media Service)
+          description: URL обложки
         audioUrl:
           type: string
           format: uri
-          description: URL аудио-потока (ссылка на Media Service)
+          description: URL аудио-потока
       required:
         - id
         - title
@@ -97,12 +154,25 @@ components:
           type: integer
         mediaId:
           type: string
-          description: ID загруженного аудиофайла из Media Service
+          format: uuid
+          description: ID загруженного аудиофайла
         coverMediaId:
           type: string
-          description: ID загруженной обложки из Media Service
+          format: uuid
+          description: ID загруженной обложки
       required:
         - title
         - artist
         - duration
         - mediaId
+
+    Error:
+      type: object
+      properties:
+        code:
+          type: integer
+        message:
+          type: string
+      required:
+        - code
+        - message

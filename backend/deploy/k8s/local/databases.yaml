@@ -1,0 +1,162 @@
+# --- Catalog DB ---
+apiVersion: v1
+kind: Service
+metadata:
+  name: catalog-db
+spec:
+  type: NodePort
+  ports:
+    - port: 5432
+      nodePort: 30001
+  selector:
+    app: catalog-db
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: catalog-db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: catalog-db
+  template:
+    metadata:
+      labels:
+        app: catalog-db
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:15-alpine
+          env:
+            - name: POSTGRES_USER
+              value: "user"
+            - name: POSTGRES_PASSWORD
+              value: "pass"
+            - name: POSTGRES_DB
+              value: "catalog_db"
+          ports:
+            - containerPort: 5432
+
+---
+# --- Library DB ---
+apiVersion: v1
+kind: Service
+metadata:
+  name: library-db
+spec:
+  type: NodePort
+  ports:
+    - port: 5432
+      nodePort: 30002
+  selector:
+    app: library-db
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: library-db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: library-db
+  template:
+    metadata:
+      labels:
+        app: library-db
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:15-alpine
+          env:
+            - name: POSTGRES_USER
+              value: "user"
+            - name: POSTGRES_PASSWORD
+              value: "pass"
+            - name: POSTGRES_DB
+              value: "library_db"
+          ports:
+            - containerPort: 5432
+
+---
+# --- Media DB ---
+apiVersion: v1
+kind: Service
+metadata:
+  name: media-db
+spec:
+  type: NodePort
+  ports:
+    - port: 5432
+      nodePort: 30003
+  selector:
+    app: media-db
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: media-db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: media-db
+  template:
+    metadata:
+      labels:
+        app: media-db
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:15-alpine
+          env:
+            - name: POSTGRES_USER
+              value: "user"
+            - name: POSTGRES_PASSWORD
+              value: "pass"
+            - name: POSTGRES_DB
+              value: "media_db"
+          ports:
+            - containerPort: 5432
+
+---
+# --- History DB ---
+apiVersion: v1
+kind: Service
+metadata:
+  name: history-db
+spec:
+  type: NodePort
+  ports:
+    - port: 5432
+      nodePort: 30004
+  selector:
+    app: history-db
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: history-db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: history-db
+  template:
+    metadata:
+      labels:
+        app: history-db
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:15-alpine
+          env:
+            - name: POSTGRES_USER
+              value: "user"
+            - name: POSTGRES_PASSWORD
+              value: "pass"
+            - name: POSTGRES_DB
+              value: "history_db"
+          ports:
+            - containerPort: 5432

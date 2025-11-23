@@ -1,0 +1,36 @@
+env: "local"
+
+catalog:
+  http:
+    port: "8880"
+  db:
+    dsn: "postgres://user:pass@localhost:55432/catalog_db?sslmode=disable"
+
+library:
+  http:
+    port: "8081"
+  db:
+    dsn: "postgres://user:pass@localhost:55433/library_db?sslmode=disable"
+
+media:
+  http:
+    port: "8882"
+  db:
+    dsn: "postgres://user:pass@localhost:55434/media_db?sslmode=disable"
+
+history:
+  http:
+    port: "8883"
+  db:
+    dsn: "postgres://user:pass@localhost:55435/history_db?sslmode=disable"
+    
+minio:
+  # ВАЖНО: Используем 127.0.0.1 вместо localhost, чтобы избежать IPv6 проблем
+  endpoint: "127.0.0.1:9000"
+  access_key: "admin"
+  secret_key: "supersecret"
+  use_ssl: false
+  buckets:
+    audio: "audio-files"
+    images: "image-files"
+    public: "public-assets"

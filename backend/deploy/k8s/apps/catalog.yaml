@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: catalog
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: catalog
+  template:
+    metadata:
+      labels:
+        app: catalog
+    spec:
+      containers:
+        - name: app
+          image: spotik/catalog:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8080
+          volumeMounts:
+            - name: config-volume
+              mountPath: /app/configs
+              readOnly: true
+          env:
+            # Перекрываем значение из файла значением из Secret
+            - name: APP_CATALOG_DB_DSN
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: catalog-dsn
+      volumes:
+        - name: config-volume
+          configMap:
+            name: app-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: catalog
+spec:
+  ports:
+    - port: 80
+      targetPort: 8080
+  selector:
+    app: catalog

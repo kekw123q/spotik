@@ -2,7 +2,7 @@ openapi: 3.0.0
 info:
   title: Media Delivery Service
   version: 1.0.0
-  description: Сервис загрузки и стриминга контента (Аудио, Видео, Изображения).
+  description: Сервис загрузки и стриминга контента.
 servers:
   - url: http://api.spotik.com/media
 tags:
@@ -11,8 +11,7 @@ tags:
 paths:
   /stream/{resourceId}:
     get:
-      summary: Получить ссылку на поток или сам поток
-      description: Используется плеером для воспроизведения. В будущем может возвращать манифест для видео.
+      summary: Получить ссылку на поток
       operationId: getStreamUrl
       tags:
         - Streaming
@@ -22,10 +21,10 @@ paths:
           required: true
           schema:
             type: string
-          description: ID медиа-ресурса (не ID трека из БД, а ID файла)
+            format: uuid
       responses:
         '200':
-          description: JSON с прямой ссылкой на CDN или Presigned URL
+          description: Ссылка на поток
           content:
             application/json:
               schema:
@@ -34,14 +33,22 @@ paths:
                   url:
                     type: string
                     format: uri
-                    example: "https://cdn.spotik.com/audio/12345.mp3?token=..."
-        '302':
-          description: Редирект непосредственно на файл (альтернативный вариант)
+        '404':
+          description: Ресурс не найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 
   /upload:
     post:
       summary: Загрузка медиа-файла
-      description: Загрузка аудио или обложки. Возвращает ID ресурса для привязки в Catalog Service.
       operationId: uploadFile
       tags:
         - Upload
@@ -58,6 +65,9 @@ paths:
                 type:
                   type: string
                   enum: [audio, image, video]
+              required:
+                - file
+                - type
       responses:
         '201':
           description: Файл загружен
@@ -68,10 +78,21 @@ paths:
                 properties:
                   mediaId:
                     type: string
-                    description: Внутренний ID файла
+                    format: uuid
                   publicUrl:
                     type: string
-                    description: Публичная ссылка (если применимо)
+        '400':
+          description: Ошибка загрузки
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 
 components:
   schemas:
@@ -82,3 +103,6 @@ components:
           type: integer
         message:
           type: string
+      required:
+        - code
+        - message
