@@ -8,14 +8,14 @@ import (
 	"syscall"
 	"time"
 
-	delivery "github.com/dkoshenkov/spotik-backend/internal/delivery/media"
-	openapi "github.com/dkoshenkov/spotik-backend/internal/gen/openapi/media-delivery"
-	repo "github.com/dkoshenkov/spotik-backend/internal/repo/media"
-	usecase "github.com/dkoshenkov/spotik-backend/internal/usecase/media"
-	"github.com/dkoshenkov/spotik-backend/pkg/config"
-	"github.com/dkoshenkov/spotik-backend/pkg/logger"
-	"github.com/dkoshenkov/spotik-backend/pkg/postgres"
-	"github.com/dkoshenkov/spotik-backend/pkg/storage"
+	delivery "github.com/kekw123q/spotik-backend/internal/delivery/media"
+	openapi "github.com/kekw123q/spotik-backend/internal/gen/openapi/media-delivery"
+	repo "github.com/kekw123q/spotik-backend/internal/repo/media"
+	usecase "github.com/kekw123q/spotik-backend/internal/usecase/media"
+	"github.com/kekw123q/spotik-backend/pkg/config"
+	"github.com/kekw123q/spotik-backend/pkg/logger"
+	"github.com/kekw123q/spotik-backend/pkg/postgres"
+	"github.com/kekw123q/spotik-backend/pkg/storage"
 )
 
 func main() {

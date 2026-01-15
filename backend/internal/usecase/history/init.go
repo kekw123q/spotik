@@ -2,8 +2,9 @@ package history
 
 import (
 	"context"
-	"github.com/dkoshenkov/spotik-backend/internal/domain"
+
 	"github.com/google/uuid"
+	"github.com/kekw123q/spotik-backend/internal/domain"
 )
 
 type Usecase struct {

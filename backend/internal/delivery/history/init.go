@@ -4,10 +4,10 @@ import (
 	"context"
 	"errors"
 
-	"github.com/dkoshenkov/spotik-backend/internal/domain"
-	openapi "github.com/dkoshenkov/spotik-backend/internal/gen/openapi/history"
-	usecase "github.com/dkoshenkov/spotik-backend/internal/usecase/history"
 	"github.com/google/uuid"
+	"github.com/kekw123q/spotik-backend/internal/domain"
+	openapi "github.com/kekw123q/spotik-backend/internal/gen/openapi/history"
+	usecase "github.com/kekw123q/spotik-backend/internal/usecase/history"
 )
 
 type Handler struct {

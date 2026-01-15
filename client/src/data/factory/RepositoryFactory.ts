@@ -1,6 +1,9 @@
 import { IMusicRepository } from '../../domain/repositories/IMusicRepository';
 import { MockMusicRepository } from '../repositories/MockMusicRepository';
 import { ApiMusicRepository } from '../repositories/ApiMusicRepository';
+import { IUserRepository } from "../../domain/repositories/IUserRepository";
+import { ApiUserRepository } from "../repositories/ApiUserRepository";
+
 
 const USE_MOCKS = import.meta.env.VITE_USE_MOCKS === 'true';
 
@@ -24,4 +27,7 @@ export class RepositoryFactory {
   static reset(): void {
     this.musicRepository = null;
   }
+   static createUserRepository(): IUserRepository {
+        return new ApiUserRepository();
+    }
 }

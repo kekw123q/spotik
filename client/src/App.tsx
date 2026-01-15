@@ -9,6 +9,9 @@ import { Player } from "./presentation/components/Player/Player";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 
+// Импортируем нашу новую страницу
+import ProfilePage from "./pages/profilepage";
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -21,6 +24,10 @@ const App = () => (
                     <BrowserRouter>
                         <Routes>
                             <Route path="/" element={<Index />} />
+                            
+                            {/* --- ДОБАВИЛИ МАРШРУТ ПРОФИЛЯ --- */}
+                            <Route path="/profile" element={<ProfilePage />} />
+
                             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                             <Route path="*" element={<NotFound />} />
                         </Routes>

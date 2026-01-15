@@ -6,10 +6,10 @@ import (
 	"fmt"
 	"net/url"
 
-	"github.com/dkoshenkov/spotik-backend/internal/domain"
-	openapi "github.com/dkoshenkov/spotik-backend/internal/gen/openapi/catalog"
-	usecase "github.com/dkoshenkov/spotik-backend/internal/usecase/catalog"
 	"github.com/google/uuid"
+	"github.com/kekw123q/spotik-backend/internal/domain"
+	openapi "github.com/kekw123q/spotik-backend/internal/gen/openapi/catalog"
+	usecase "github.com/kekw123q/spotik-backend/internal/usecase/catalog"
 )
 
 const mediaService = "http://api.spotik.com/media/stream"

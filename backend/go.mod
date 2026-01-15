@@ -1,4 +1,4 @@
-module github.com/dkoshenkov/spotik-backend
+module github.com/kekw123q/spotik-backend
 
 go 1.25.3
 

@@ -6,9 +6,9 @@ import (
 	"io"
 	"net/url"
 
-	"github.com/dkoshenkov/spotik-backend/internal/domain"
-	openapi "github.com/dkoshenkov/spotik-backend/internal/gen/openapi/media-delivery"
 	"github.com/google/uuid"
+	"github.com/kekw123q/spotik-backend/internal/domain"
+	openapi "github.com/kekw123q/spotik-backend/internal/gen/openapi/media-delivery"
 )
 
 // Интерфейс UseCase (определен в delivery, так как delivery его использует)

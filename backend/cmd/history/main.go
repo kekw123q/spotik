@@ -8,13 +8,13 @@ import (
 	"syscall"
 	"time"
 
-	delivery "github.com/dkoshenkov/spotik-backend/internal/delivery/history"
-	openapi "github.com/dkoshenkov/spotik-backend/internal/gen/openapi/history"
-	repo "github.com/dkoshenkov/spotik-backend/internal/repo/history"
-	usecase "github.com/dkoshenkov/spotik-backend/internal/usecase/history"
-	"github.com/dkoshenkov/spotik-backend/pkg/config"
-	"github.com/dkoshenkov/spotik-backend/pkg/logger"
-	"github.com/dkoshenkov/spotik-backend/pkg/postgres"
+	delivery "github.com/kekw123q/spotik-backend/internal/delivery/history"
+	openapi "github.com/kekw123q/spotik-backend/internal/gen/openapi/history"
+	repo "github.com/kekw123q/spotik-backend/internal/repo/history"
+	usecase "github.com/kekw123q/spotik-backend/internal/usecase/history"
+	"github.com/kekw123q/spotik-backend/pkg/config"
+	"github.com/kekw123q/spotik-backend/pkg/logger"
+	"github.com/kekw123q/spotik-backend/pkg/postgres"
 )
 
 func main() {

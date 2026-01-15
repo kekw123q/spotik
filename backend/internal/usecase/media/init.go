@@ -7,9 +7,9 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/dkoshenkov/spotik-backend/internal/domain"
-	"github.com/dkoshenkov/spotik-backend/pkg/config"
 	"github.com/google/uuid"
+	"github.com/kekw123q/spotik-backend/internal/domain"
+	"github.com/kekw123q/spotik-backend/pkg/config"
 )
 
 // Интерфейс репозитория метаданных (определен там, где используется)

@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/dkoshenkov/spotik-backend/internal/domain"
-	"github.com/dkoshenkov/spotik-backend/pkg/postgres"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
+	"github.com/kekw123q/spotik-backend/internal/domain"
+	"github.com/kekw123q/spotik-backend/pkg/postgres"
 )
 
 type Repository struct {
