@@ -45,7 +45,27 @@ func main() {
 
 	// 4. Роутер
 	mux := http.NewServeMux()
+	fs := http.FileServer(http.Dir("./uploads"))
+	mux.Handle("/uploads/", http.StripPrefix("/uploads/", fs))
 
+	// 2. API для загрузки
+	mux.HandleFunc("/api/upload", func(w http.ResponseWriter, r *http.Request) {
+		// CORS
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS")
+		// Разрешаем браузеру отправлять заголовки (нужно для корректной работы)
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+
+		if r.Method == http.MethodOptions {
+			return
+		}
+
+		if r.Method == http.MethodPost {
+			handler.UploadAvatar(w, r)
+		} else {
+			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		}
+	})
 	// Настраиваем маршруты
 	mux.HandleFunc("/api/profile", func(w http.ResponseWriter, r *http.Request) {
 		// CORS заголовки
