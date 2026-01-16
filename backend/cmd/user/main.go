@@ -27,7 +27,7 @@ func main() {
 	defer cancel()
 
 	// ВАЖНО: Жестко прописываем подключение к нашему Docker контейнеру (порт 5432)
-	dsn := "postgres://postgres:postgres@127.0.0.1:5432/spotik_db?sslmode=disable"
+	dsn := "postgres://postgres:postgres@localhost:5432/spotik_db?sslmode=disable"
 
 	pgClient, err := postgres.New(ctx, dsn)
 	if err != nil {
